@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste de Cocktails</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="text-center">Liste de Cocktails</h1>
+        <div class="row mt-4" id="cocktailList"></div>
+    </div>
+
+    <script >
+
+document.addEventListener('DOMContentLoaded', () => {
+    const cocktailList = document.getElementById('cocktailList');
+
+    // Chargement du fichier JSON
+    fetch('cocktails.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP : ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            displayCocktails(data);
+        })
+        .catch(error => {
+            console.error('Erreur de chargement des cocktails :', error);
+        });
+
+    // Affichage des cocktails
+    function displayCocktails(cocktails) {
+        cocktails.forEach(cocktail => {
+            const col = document.createElement('div');
+            col.classList.add('col-md-4', 'mb-4');
+
+            col.innerHTML = `
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">${cocktail.name}</h5>
+                        <p class="card-text">${cocktail.description}</p>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#cocktailModal-${cocktail.name.replace(/\s+/g, '')}">
+                            Voir les détails
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Modal -->
+                <div class="modal fade" id="cocktailModal-${cocktail.name.replace(/\s+/g, '')}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">${cocktail.name}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Ingrédients :</strong></p>
+                                <ul>
+                                    ${cocktail.ingredients.map(ingredient => `<li>${ingredient}</li>`).join('')}
+                                </ul>
+                                <p>${cocktail.description}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            cocktailList.appendChild(col);
+        });
+    }
+});
+
+
+    </script>
+</body>
+</html>
